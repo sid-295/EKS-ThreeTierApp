@@ -33,7 +33,7 @@ helm repo add eks https://aws.github.io/eks-charts
 helm repo update eks
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=my-cluster --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller
 kubectl get deployment -n kube-system aws-load-balancer-controller
-kubectl apply -f full_stack_lb.yaml
+
 ```
 
 ### 5. Deploy Helm charts (for example, AWS Load Balancer Controller)
@@ -43,17 +43,6 @@ helm repo update
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=three-tier-cluster --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller
 ```
 
-## Cleanup
 
-To delete the EKS cluster and avoid unnecessary charges:
-```bash
-eksctl delete cluster --name three-tier-cluster --region us-east-1
-```
 
----
 
-Feel free to customize the manifests and Docker images to add your own features!
-
----
-
-Happy Deploying! 🚀
