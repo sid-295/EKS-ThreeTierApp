@@ -1,4 +1,4 @@
-# EKS Three-Tier Application
+# EKS Three-Tier  Web-Application
 
 This project demonstrates deployment of a Three-Tier Web Application using Docker and AWS EKS.
 
