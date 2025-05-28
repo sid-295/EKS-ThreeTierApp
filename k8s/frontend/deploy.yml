@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: three-tier
+  labels:
+    role: frontend
+    env: demo
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25%
+  selector:
+    matchLabels:
+      role: frontend
+  template:
+    metadata:
+      labels:
+        role: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: cyber295/app-frontend:v1
+        imagePullPolicy: Always
+        env:
+          - name: API_URL
+            value: " http://k8s.cyber295.xyz/api/tasks"
+        ports:
+        - containerPort: 3000
