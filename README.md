@@ -11,37 +11,33 @@ The application consists of three parts:
 
 ## Steps I followed
 
-### 1. Create EKS Cluster using eksctl
-```bash
-eksctl create cluster --name three-tier-cluster --region us-east-1 --node-type t2.medium --nodes 2 --nodes-min 2 --nodes-max 2
+
+### Step 1: Setup EKS Cluster
+``` shell
+eksctl create cluster --name three-tier-cluster --region us-west-2 --node-type t2.medium --nodes-min 2 --nodes-max 2
+aws eks update-kubeconfig --region us-west-2 --name three-tier-cluster
+kubectl get nodes
 ```
 
-### 2. Update kubeconfig to connect kubectl with EKS cluster
-```bash
-aws eks update-kubeconfig --region us-east-1 --name three-tier-cluster
+
+### Step 2: Install AWS Load Balancer
+``` shell
+curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json
+aws iam create-policy --policy-name AWSLoadBalancerControllerIAMPolicy --policy-document file://iam_policy.json
+eksctl utils associate-iam-oidc-provider --region=us-west-2 --cluster=three-tier-cluster --approve
+eksctl create iamserviceaccount --cluster=three-tier-cluster --namespace=kube-system --name=aws-load-balancer-controller --role-name AmazonEKSLoadBalancerControllerRole --attach-policy-arn=arn:aws:iam::626072240565:policy/AWSLoadBalancerControllerIAMPolicy --approve --region=us-west-2
 ```
 
-
-
-### 3. Install Helm (if not installed)
-```bash
+### Step 3: Deploy AWS Load Balancer Controller
+``` shell
 sudo snap install helm --classic
-```
-### 4. sudo snap install helm --classic
-```bash
 helm repo add eks https://aws.github.io/eks-charts
 helm repo update eks
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=my-cluster --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller
 kubectl get deployment -n kube-system aws-load-balancer-controller
-
+kubectl apply -f full_stack_lb.yaml
 ```
 
-### 5. Deploy Helm charts (for example, AWS Load Balancer Controller)
-```bash
-helm repo add eks https://aws.github.io/eks-charts
-helm repo update
-helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=three-tier-cluster --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller
-```
 
 
 
